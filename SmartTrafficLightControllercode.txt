@@ -1,0 +1,80 @@
+package smarttraffic;
+
+// Interface (for controlling lights)
+interface Controllable {
+    void turnOn();
+    void turnOff();
+}
+
+// Base class (uses inheritance)
+class LightController implements Controllable {
+    protected String location;
+    protected boolean status;
+
+    public LightController(String location) {
+        this.location = location;
+        this.status = false;
+    }
+
+    @Override
+    public void turnOn() {
+        status = true;
+        System.out.println(location + " light is ON");
+    }
+
+    @Override
+    public void turnOff() {
+        status = false;
+        System.out.println(location + " light is OFF");
+    }
+}
+
+// Derived class (implements Runnable for multithreading)
+class TrafficLight extends LightController implements Runnable {
+    private String[] colors = {"RED", "GREEN", "YELLOW"}; // Array usage
+    private int duration; // milliseconds
+
+    public TrafficLight(String location, int duration) {
+        super(location);
+        this.duration = duration;
+    }
+
+    @Override
+    public void run() {
+        turnOn();
+        try {
+            for (String color : colors) {
+                System.out.println(location + " light: " + color);
+                Thread.sleep(duration);
+            }
+        } catch (InterruptedException e) {
+            System.out.println(location + " light interrupted.");
+        } finally {
+            turnOff();
+        }
+    }
+}
+
+// Main class
+public class SmartTrafficLightController {
+    public static void main(String[] args) {
+        // Array of traffic lights
+        TrafficLight[] lights = {
+            new TrafficLight("North", 1000),
+            new TrafficLight("South", 1000),
+            new TrafficLight("East", 1000),
+            new TrafficLight("West", 1000)
+        };
+
+        // Display starting message using String
+        String message = "Smart Traffic Light Simulation Started!";
+        System.out.println(message.toUpperCase());
+        System.out.println("--------------------------------------");
+
+        // Multithreading: start all lights
+        for (TrafficLight light : lights) {
+            Thread t = new Thread(light);
+            t.start();
+        }
+    }
+}
